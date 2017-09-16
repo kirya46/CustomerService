@@ -14,7 +14,7 @@ public class Customer {
     @Id
     @GenericGenerator(name="generator", strategy="identity")
     @GeneratedValue(generator="generator")
-    private int id;
+    private long id;
 
     @Column
     private String name;
@@ -25,11 +25,11 @@ public class Customer {
     @Column
     private String phone;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

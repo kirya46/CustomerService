@@ -43,6 +43,7 @@
                 <version>3.0.5</version>
                 <configuration>
                     <propertyFile>src/main/resources/liquibase/liquibase.properties</propertyFile>
+
                 </configuration>
                 <executions>
                     <execution>
@@ -107,6 +108,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>4.3.11.RELEASE</version>
+        </dependency>
+
 
         <!-- H2 Database -->
         <dependency>
@@ -121,39 +128,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!--MiBatis-->
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>3.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-spring</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>4.3.11.RELEASE</version>
-        </dependency>
-
-
+        <!--PostgreSql database-->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -161,7 +136,6 @@
         </dependency>
 
     </dependencies>
-
 
 
 </project>

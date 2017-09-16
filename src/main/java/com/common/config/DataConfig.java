@@ -1,21 +1,18 @@
 package com.common.config;
 
-import com.common.domain.Customer;
-import com.common.persistence.CustomerMapper;
 import org.hibernate.SessionFactory;
-import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
-
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.Properties;
 
 /**
@@ -24,20 +21,61 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-
+@PropertySource(value = "database.properties")
 public class DataConfig {
 
+    @Value("${db.driver}")
+    private String DB_DRIVER;
 
+    @Value("${db.password}")
+    private String DB_PASSWORD;
 
-    private Properties hibernateProperties() {
-        Properties properties = new Properties();
-//        properties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-//        properties.put("hibernate.dialect","org.hibernate.dialect.PostgreSQL95Dialect");
-        properties.put("hibernate.show_sql", "true");
-        properties.put("hibernate.format_sql", "true");
-        properties.put("hibernate.hbm2ddl.auto", "update");
-        properties.put("hibernate.lazy", "false");
-        return properties;
+    @Value("${db.url}")
+    private String DB_URL;
+
+    @Value("${db.username}")
+    private String DB_USERNAME;
+
+    @Value("${hibernate.dialect}")
+    private String HIBERNATE_DIALECT;
+
+    @Value("${hibernate.show_sql}")
+    private String HIBERNATE_SHOW_SQL;
+
+    @Value("${hibernate.hbm2ddl.auto}")
+    private String HIBERNATE_HBM2DDL_AUTO;
+
+    @Value("${entitymanager.packagesToScan}")
+    private String ENTITYMANAGER_PACKAGES_TO_SCAN;
+
+    @Bean
+    public DataSource dataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(DB_DRIVER);
+        dataSource.setUrl(DB_URL);
+        dataSource.setUsername(DB_USERNAME);
+        dataSource.setPassword(DB_PASSWORD);
+        return dataSource;
+    }
+
+    @Bean
+    public SessionFactory sessionFactory() {
+
+        final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(dataSource());
+
+        Properties hibernateProperties = new Properties();
+        hibernateProperties.put("hibernate.dialect", HIBERNATE_DIALECT);
+        hibernateProperties.put("hibernate.show_sql", HIBERNATE_SHOW_SQL);
+        hibernateProperties.put("hibernate.hbm2ddl.auto", HIBERNATE_HBM2DDL_AUTO);
+        return localSessionFactoryBuilder
+                .scanPackages(ENTITYMANAGER_PACKAGES_TO_SCAN)
+                .addProperties(hibernateProperties)
+                .buildSessionFactory();
+    }
+
+    @Bean
+    public HibernateTransactionManager transactionManager() {
+        return new HibernateTransactionManager(sessionFactory());
     }
 
     @Bean
@@ -45,40 +83,5 @@ public class DataConfig {
         HibernateTemplate hibernateTemplate = new HibernateTemplate(sessionFactory());
         hibernateTemplate.setCheckWriteOperations(false);
         return hibernateTemplate;
-    }
-
-    @Bean
-    public SessionFactory sessionFactory() {
-
-        //set model package
-        final String modelPackage = Customer.class.getPackage().getName();
-
-        final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(getDataSource());
-
-        return localSessionFactoryBuilder
-                .scanPackages(modelPackage)
-                .addProperties(hibernateProperties())
-                .buildSessionFactory();
-    }
-
-    @Bean
-    public DataSource getDataSource() {
-//        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-//        dataSource.setDriverClass(org.h2.Driver.class);
-//        dataSource.setUsername("admin");
-//        dataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
-//        dataSource.setPassword("");
-        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-        dataSource.setDriverClass(org.postgresql.Driver.class);
-        dataSource.setUsername("kirya");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/customerdb");
-        dataSource.setPassword("");
-
-        return dataSource;
-    }
-
-    @Bean
-    public HibernateTransactionManager transactionManager() {
-        return new HibernateTransactionManager(sessionFactory());
     }
 }
