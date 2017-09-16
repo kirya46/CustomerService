@@ -27,15 +27,7 @@ import java.util.Properties;
 
 public class DataConfig {
 
-    @Bean(initMethod = "start", destroyMethod = "stop")
-    public org.h2.tools.Server h2WebConsonleServer() throws SQLException {
-        return org.h2.tools.Server.createWebServer("-web", "-webAllowOthers", "-webDaemon", "-webPort", "8082");
-    }
 
-    @Bean
-    public CustomerMapper customerMapper() {
-        return new CustomerMapper();
-    }
 
     private Properties hibernateProperties() {
         Properties properties = new Properties();
