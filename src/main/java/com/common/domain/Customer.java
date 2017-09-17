@@ -17,7 +17,7 @@ import java.util.Set;
 public class Customer {
 
     @Id
-    @GenericGenerator(name="generator", strategy="identity")
+    @GenericGenerator(name="generator", strategy="increment")
     @GeneratedValue(generator="generator")
     private long id;
 
@@ -33,7 +33,7 @@ public class Customer {
     @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER,cascade = CascadeType.ALL)//mappedBy for fix child ids duplicate
     @Fetch(FetchMode.SELECT)//for skip entity duplicates on findAll query
     @JsonManagedReference
-    private Set<Order> c_orders = new HashSet<>();
+    private Set<Order> orders = new HashSet<>();
 
     public Customer() {
     }
@@ -77,11 +77,16 @@ public class Customer {
     }
 
     public Set<Order> getOrders() {
-        return c_orders;
+        return orders;
     }
 
-    public void setC_orders(Set<Order> c_orders) {
-        this.c_orders = c_orders;
+    public void setOrders(Set<Order> orders) {
+        this.orders = orders;
+    }
+
+    public void addOrder(Order order){
+        this.orders.add(order);
+        order.setCustomer(this);
     }
 
     @Override
@@ -91,28 +96,29 @@ public class Customer {
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", phone='" + phone + '\'' +
+                ", c_orders=" + orders +
                 '}';
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//
-//        Customer customer = (Customer) o;
-//
-//        if (id != customer.id) return false;
-//        if (name != null ? !name.equals(customer.name) : customer.name != null) return false;
-//        if (surname != null ? !surname.equals(customer.surname) : customer.surname != null) return false;
-//        return phone != null ? phone.equals(customer.phone) : customer.phone == null;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        int result = (int) (id ^ (id >>> 32));
-//        result = 31 * result + (name != null ? name.hashCode() : 0);
-//        result = 31 * result + (surname != null ? surname.hashCode() : 0);
-//        result = 31 * result + (phone != null ? phone.hashCode() : 0);
-//        return result;
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Customer customer = (Customer) o;
+
+        if (id != customer.id) return false;
+        if (name != null ? !name.equals(customer.name) : customer.name != null) return false;
+        if (surname != null ? !surname.equals(customer.surname) : customer.surname != null) return false;
+        return phone != null ? phone.equals(customer.phone) : customer.phone == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (surname != null ? surname.hashCode() : 0);
+        result = 31 * result + (phone != null ? phone.hashCode() : 0);
+        return result;
+    }
 }

@@ -26,6 +26,7 @@ public class CustomerController {
     @RequestMapping(
             value = "/create",
             method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity<Customer> create(@RequestBody Customer customer) {
@@ -33,10 +34,35 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body(savedCustomer);
     }
 
+    @RequestMapping(
+            value = "/update",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    public ResponseEntity<Customer> update(@RequestBody Customer customer){
+        final Customer updatedCustomer = this.customerService.save(customer);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedCustomer);
+    }
+
+    @RequestMapping(value = "/{customerId}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Customer> get(@PathVariable("customerId") Long id){
+        final Customer customer = this.customerService.find(id);
+        return ResponseEntity.status(HttpStatus.OK).body(customer);
+    }
+
+
+    @RequestMapping(value = "/delete/{customerId}")
+    public ResponseEntity delete(@PathVariable("customerId")Long id){
+        this.customerService.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     @RequestMapping(
             value = "{customerId}/orders/add",
-            method = RequestMethod.POST
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity addOrder(@PathVariable("customerId") long customerId, @RequestBody Order order){
 
@@ -47,8 +73,9 @@ public class CustomerController {
 
         final Order savedOrder = this.orderService.save(order);
 
-        customer.getOrders().add(savedOrder);
+        customer.addOrder(savedOrder);
         this.customerService.save(customer);
+
         return ResponseEntity.status(HttpStatus.OK).body(savedOrder);
     }
 }

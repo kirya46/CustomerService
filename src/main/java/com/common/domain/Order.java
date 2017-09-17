@@ -14,7 +14,7 @@ public class Order {
 
 
     @Id
-    @GenericGenerator(name="generator", strategy="identity")
+    @GenericGenerator(name="generator", strategy="increment")
     @GeneratedValue(generator="generator")
     private long id;
 
@@ -53,6 +53,14 @@ public class Order {
         this.price = price;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -62,26 +70,26 @@ public class Order {
                 '}';
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//
-//        Order order = (Order) o;
-//
-//        if (id != order.id) return false;
-//        if (Double.compare(order.price, price) != 0) return false;
-//        return description != null ? description.equals(order.description) : order.description == null;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        int result;
-//        long temp;
-//        result = (int) (id ^ (id >>> 32));
-//        result = 31 * result + (description != null ? description.hashCode() : 0);
-//        temp = Double.doubleToLongBits(price);
-//        result = 31 * result + (int) (temp ^ (temp >>> 32));
-//        return result;
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Order order = (Order) o;
+
+        if (id != order.id) return false;
+        if (Double.compare(order.price, price) != 0) return false;
+        return description != null ? description.equals(order.description) : order.description == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        temp = Double.doubleToLongBits(price);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }
