@@ -2,10 +2,8 @@ package com.common.config;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -20,8 +18,9 @@ import java.util.Properties;
  */
 @Configuration
 @EnableTransactionManagement
+@EnableJpaRepositories(basePackages = "com.common.persistence")
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@PropertySource(value = "database.properties")
+@PropertySource("classpath:database.properties")
 public class DataConfig {
 
     @Value("${db.driver}")
@@ -47,6 +46,7 @@ public class DataConfig {
 
     @Value("${entitymanager.packagesToScan}")
     private String ENTITYMANAGER_PACKAGES_TO_SCAN;
+
 
     @Bean
     public DataSource dataSource() {
@@ -84,4 +84,5 @@ public class DataConfig {
         hibernateTemplate.setCheckWriteOperations(false);
         return hibernateTemplate;
     }
+
 }

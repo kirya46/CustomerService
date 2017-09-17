@@ -43,7 +43,7 @@
                 <version>3.0.5</version>
                 <configuration>
                     <propertyFile>src/main/resources/liquibase/liquibase.properties</propertyFile>
-
+                    <changeLogFile>src/main/resources/db/liquibase-changelog.xml</changeLogFile>
                 </configuration>
                 <executions>
                     <execution>
@@ -83,11 +83,6 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
 
-        <!--SPRING WEB STARTER-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
 
         <!--SPRING DATA JPA-->
         <dependency>
@@ -106,7 +101,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
