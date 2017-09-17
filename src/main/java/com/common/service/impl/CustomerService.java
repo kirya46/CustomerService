@@ -1,13 +1,15 @@
 package com.common.service.impl;
 
 import com.common.domain.Customer;
-import com.common.exception.CustomerNotFoundException;
 import com.common.persistence.CustomerRepository;
 import com.common.service.GenericService;
+import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -19,6 +21,9 @@ public class CustomerService implements GenericService<Customer,Long>{
     @Autowired
     private CustomerRepository repository;
 
+
+    @Override
+    @Transactional
     public Customer save(Customer customer){
         return this.repository.save(customer);
     }
@@ -35,6 +40,7 @@ public class CustomerService implements GenericService<Customer,Long>{
 
 
     @Override
+    @Transactional
     public List<Customer> findAll(){
         return this.repository.findAll();
     }

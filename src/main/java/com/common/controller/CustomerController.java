@@ -40,7 +40,6 @@ public class CustomerController {
     )
     public ResponseEntity addOrder(@PathVariable("customerId") long customerId, @RequestBody Order order){
 
-        System.out.println("Customer id: " + this.customerService.findAll().toString());
         final Customer customer = this.customerService.find(customerId);
         if (customer == null) {
             return ResponseEntity.badRequest().build();

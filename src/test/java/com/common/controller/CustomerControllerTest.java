@@ -1,3 +1,5 @@
+package com.common.controller;
+
 import com.common.Application;
 import com.common.config.AppConfig;
 import com.common.config.DataConfig;
@@ -7,10 +9,13 @@ import com.common.service.impl.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.is;
@@ -41,12 +47,7 @@ public class CustomerControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private CustomerService customerService;
-
     private MockMvc mockMvc;
-
-    private Customer customer;
 
     @Before
     public void setup() throws Exception {
@@ -110,45 +111,56 @@ public class CustomerControllerTest {
 
     @Test
     public void addOrder() throws  Exception{
-        this.customer = this.customerService.save(new Customer("Test name", "Test surname", "2131244"));
-        System.out.println("after save: " + customerService.findAll());
+        Customer customer = new Customer();
+        customer.setName("Test name");
+        customer.setSurname("Test surname");
+
+        //convert object to json
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+        String requestJson = ow.writeValueAsString(customer);
+
+        //prepare request
+        MockHttpServletRequestBuilder postRequest = post("/customer/create")
+                .content(requestJson)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+
+        //execute request
+        ResultActions resultActions = mockMvc.perform(postRequest);
+
+        //validate result
+        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+        resultActions.andExpect(jsonPath("id", not(1L)));
+        resultActions.andExpect(jsonPath("name", is(customer.getName())));
+        resultActions.andExpect(jsonPath("surname", is(customer.getSurname())));
+        resultActions.andExpect(jsonPath("phone", is(customer.getPhone())));
 
         Order order = new Order();
         order.setDescription("Order description");
         order.setPrice(99.99);
 
         //convert object to json
-        ObjectMapper mapper = new ObjectMapper();
+        mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson = ow.writeValueAsString(order);
+        ow = mapper.writer().withDefaultPrettyPrinter();
+        requestJson = ow.writeValueAsString(order);
 
-        final String path = "/customer/" + this.customer.getId() + "/orders/add";
-        System.out.println(path);// FIXME: 17/09/17
+        final String path = "/customer/1/orders/add";
+
+        System.out.println("Path: " + path);
+        System.out.println("Request: " + requestJson);
+
         //prepare request
-        final MockHttpServletRequestBuilder postRequest = post(path)
+        postRequest = post(path)
                 .content(requestJson)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
 
-
-
-//        System.out.println(customer.toString());
-//        System.out.println(order.toString());
-//        System.out.println(requestJson);
-
-
-
         //execute request
-        final ResultActions resultActions = mockMvc.perform(postRequest);
+        resultActions = mockMvc.perform(postRequest);
 
         //validate result
-//        resultActions.andExpect(status().isOk());
-//        resultActions.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
-//        resultActions.andExpect(jsonPath("id", not(0)));
-//        resultActions.andExpect(jsonPath("name", is(customer.getName())));
-//        resultActions.andExpect(jsonPath("surname", is(customer.getSurname())));
-//        resultActions.andExpect(jsonPath("phone", is(customer.getPhone())));
-//        final MvcResult mvcResult = resultActions.andReturn();
-//        System.out.println(mvcResult.getResponse().getContentAsString());
+        resultActions.andExpect(status().isOk());
     }
 }

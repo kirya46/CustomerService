@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <!--Drop table 'customer'-->
+    <changeSet id="1" author="admin">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="customer"/>
+        </preConditions>
+        <dropTable tableName="customer" cascadeConstraints="true"/>
+    </changeSet>
+
+    <!--Drop table 'c_order'-->
+    <changeSet id="2" author="admin">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="c_order"/>
+        </preConditions>
+        <dropTable tableName="c_order" cascadeConstraints="true"/>
+    </changeSet>
+
+    <!--Create table 'customer'-->
+    <changeSet id="3" author="admin">
+        <createTable tableName="customer">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="customer_id_pk" />
+            </column>
+            <column name="name" type="varchar(255)"/>
+            <column name="surname" type="varchar(255)"/>
+            <column name="phone" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <!--Create table 'c_order'-->
+    <changeSet id="4" author="admin">
+        <createTable tableName="c_order">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="c_order_id_pk" />
+            </column>
+            <column name="description" type="text"/>
+            <column name="price" type="double"/>
+            <column name="customer" type="bigint">
+                <constraints foreignKeyName="customer" references="customer(id)"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
