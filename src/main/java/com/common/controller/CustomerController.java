@@ -2,6 +2,7 @@ package com.common.controller;
 
 import com.common.domain.Customer;
 import com.common.domain.Order;
+import com.common.exception.CustomerExistingNameException;
 import com.common.service.impl.CustomerService;
 import com.common.service.impl.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,18 @@ public class CustomerController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<Customer> create(@RequestBody Customer customer) {
-        final Customer savedCustomer = this.customerService.save(customer);
+    public ResponseEntity<Customer> create(@RequestBody Customer customer)  {
+        // TODO: 18/09/17 verify name of customer
+        //https://stackoverflow.com/questions/32441919/how-return-error-message-in-spring-mvc-controller
+        final Customer savedCustomer;
+
+        try {
+            savedCustomer = this.customerService.save(customer);
+        } catch (CustomerExistingNameException e) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCustomer);
+
     }
 
     @RequestMapping(
@@ -42,9 +52,12 @@ public class CustomerController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<Customer> update(@RequestBody Customer customer) {
-        final Customer updatedCustomer = this.customerService.save(customer);
+    public ResponseEntity<Customer> update(@RequestBody Customer customer) throws CustomerExistingNameException {
+        final Customer updatedCustomer;
+
+        updatedCustomer = this.customerService.save(customer);
         return ResponseEntity.status(HttpStatus.OK).body(updatedCustomer);
+
     }
 
     @RequestMapping(value = "/{customerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -79,7 +92,7 @@ public class CustomerController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity addOrder(@PathVariable("customerId") long customerId, @RequestBody Order order) {
+    public ResponseEntity addOrder(@PathVariable("customerId") long customerId, @RequestBody Order order) throws CustomerExistingNameException {
 
         final Customer customer = this.customerService.find(customerId);
         if (customer == null) {
@@ -91,6 +104,6 @@ public class CustomerController {
         customer.addOrder(savedOrder);
         this.customerService.save(customer);
 
-        return ResponseEntity.status(HttpStatus.OK).body(savedOrder);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedOrder);
     }
 }

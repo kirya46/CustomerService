@@ -1,5 +1,7 @@
 package com.common.service;
 
+import com.common.exception.CustomerExistingNameException;
+
 import java.util.List;
 
 /**
@@ -7,7 +9,7 @@ import java.util.List;
  */
 public interface GenericService <E,PK>{
 
-    E save(E newInstance);
+    E save(E newInstance) throws Exception;
 
     void delete(PK primaryKey);
 

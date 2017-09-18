@@ -5,6 +5,7 @@ import com.common.config.AppConfig;
 import com.common.config.DataConfig;
 import com.common.domain.Customer;
 import com.common.domain.Order;
+import com.common.exception.CustomerExistingNameException;
 import com.common.persistence.CustomerRepository;
 import com.common.persistence.OrderRepository;
 import com.common.service.impl.CustomerService;
@@ -30,6 +31,8 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.UUID;
 
 import static junit.framework.TestCase.*;
 import static org.hamcrest.Matchers.is;
@@ -70,7 +73,7 @@ public class CustomerControllerTest {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
 
         customer = new Customer();
-        customer.setName("Test name");
+        customer.setName("Test name " + UUID.randomUUID().toString().substring(0,4));
         customer.setSurname("Test surname");
 
         mapper = new ObjectMapper();
@@ -109,6 +112,39 @@ public class CustomerControllerTest {
         JSONObject jsonObject = new JSONObject(contentAsString);
         final long id = jsonObject.getLong("id");
         this.customer.setId(id);
+    }
+
+    @Test()
+    public void createWithException() throws Exception {
+
+        //convert object to json
+
+        String requestJson = ow.writeValueAsString(customer);
+
+        //prepare request
+        MockHttpServletRequestBuilder postRequest = post("/customer/create")
+                .content(requestJson)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+
+        //execute request
+        ResultActions resultActions;
+
+        resultActions = mockMvc.perform(postRequest);
+
+        //validate result
+        resultActions.andExpect(status().isCreated());
+        resultActions.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+        resultActions.andExpect(jsonPath("id", not(0)));
+        resultActions.andExpect(jsonPath("name", is(customer.getName())));
+        resultActions.andExpect(jsonPath("surname", is(customer.getSurname())));
+        resultActions.andExpect(jsonPath("phone", is(customer.getPhone())));
+
+        postRequest = post("/customer/create")
+                .content(requestJson)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+
+        resultActions = mockMvc.perform(postRequest);
+        resultActions.andExpect(status().isBadRequest());
     }
 
     @Test
@@ -222,8 +258,8 @@ public class CustomerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         final ResultActions perform = mockMvc.perform(getRequest);
         final String contentAsString = perform.andReturn().getResponse().getContentAsString();
-        JSONArray jsonObject = new JSONArray(contentAsString);
-        assertEquals(1,jsonObject.length());
+        JSONArray array = new JSONArray(contentAsString);
+        assertNotSame(0,array.length());
     }
 
     @Test
@@ -301,7 +337,7 @@ public class CustomerControllerTest {
         resultActions = mockMvc.perform(postRequest);
 
         //validate result
-        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(status().isCreated());
 
 
         final Customer savedCustomer = this.customerService.find(1L);
