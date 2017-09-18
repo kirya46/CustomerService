@@ -29,6 +29,20 @@ public class Order {
     @JsonBackReference
     private Customer customer;
 
+    public Order() {
+    }
+
+    public Order(String description, double price) {
+        this.description = description;
+        this.price = price;
+    }
+
+    public Order(String description, double price, Customer customer) {
+        this.description = description;
+        this.price = price;
+        this.customer = customer;
+    }
+
     public long getId() {
         return id;
     }

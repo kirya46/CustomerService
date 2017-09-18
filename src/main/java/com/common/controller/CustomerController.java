@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Created by Kirill Stoianov on 16/09/17.
  */
@@ -31,7 +33,7 @@ public class CustomerController {
     )
     public ResponseEntity<Customer> create(@RequestBody Customer customer) {
         final Customer savedCustomer = this.customerService.save(customer);
-        return ResponseEntity.status(HttpStatus.OK).body(savedCustomer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedCustomer);
     }
 
     @RequestMapping(
@@ -40,22 +42,35 @@ public class CustomerController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<Customer> update(@RequestBody Customer customer){
+    public ResponseEntity<Customer> update(@RequestBody Customer customer) {
         final Customer updatedCustomer = this.customerService.save(customer);
         return ResponseEntity.status(HttpStatus.OK).body(updatedCustomer);
     }
 
-    @RequestMapping(value = "/{customerId}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Customer> get(@PathVariable("customerId") Long id){
+    @RequestMapping(value = "/{customerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Customer> get(@PathVariable("customerId") Long id) {
         final Customer customer = this.customerService.find(id);
         return ResponseEntity.status(HttpStatus.OK).body(customer);
     }
 
+    @RequestMapping(
+            value = "/all",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    public ResponseEntity<List<Customer>> getAll() {
+        final List<Customer> all = this.customerService.findAll();
+        return ResponseEntity.status(HttpStatus.OK).body(all);
+    }
+
 
     @RequestMapping(value = "/delete/{customerId}")
-    public ResponseEntity delete(@PathVariable("customerId")Long id){
-        this.customerService.delete(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity delete(@PathVariable("customerId") Long id) {
+        if (this.customerService.find(id) != null) {
+            this.customerService.delete(id);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @RequestMapping(
@@ -64,7 +79,7 @@ public class CustomerController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity addOrder(@PathVariable("customerId") long customerId, @RequestBody Order order){
+    public ResponseEntity addOrder(@PathVariable("customerId") long customerId, @RequestBody Order order) {
 
         final Customer customer = this.customerService.find(customerId);
         if (customer == null) {

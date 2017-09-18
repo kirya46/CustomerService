@@ -2,9 +2,7 @@ package com.common.persistence;
 
 import com.common.Application;
 import com.common.domain.Customer;
-import com.common.persistence.CustomerRepository;
-import org.junit.After;
-import org.junit.Assert;
+import com.common.domain.Order;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by Kirill Stoianov on 17/09/17.
@@ -23,42 +19,42 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {Application.class})
 @DataJpaTest
-public class CustomerRepositoryTest {
+public class OrderRepositoryTest {
 
     @Autowired
-    private CustomerRepository repository;
+    private OrderRepository repository;
 
-    private Customer customer;
+    private Order order;
 
     @Before
     public void setUp() throws Exception {
         this.repository.deleteAll();
-        Customer object  = new Customer("Test name", "Test surname", "2131244");
-        customer = this.repository.save(object);
+        Order object  = new Order("Order test description",19.99);
+        order = this.repository.save(object);
     }
 
     @Test
     public void save() throws Exception {
-        assertNotEquals(0,customer.getId());
+        assertNotEquals(0, order.getId());
         assertEquals(1,this.repository.findAll().size());
     }
 
     @Test
     public void get() {
-        final Customer existingCustomer = this.repository.getOne(1L);
-        assertNotNull(existingCustomer);
+        final Order existing = this.repository.getOne(1L);
+        assertNotNull(existing);
     }
 
     @Test
     public void update(){
-        this.customer.setName("New test name");
-        this.repository.save(this.customer);
-        assertEquals(customer.getName(),this.repository.findOne(this.customer.getId()).getName());
+        this.order.setDescription("New order test description");
+        this.repository.save(this.order);
+        assertEquals(order.getDescription(),this.repository.findOne(this.order.getId()).getDescription());
     }
 
     @Test
     public void delete(){
-        this.repository.delete(this.customer.getId());
+        this.repository.delete(this.order.getId());
         assertEquals(0, this.repository.findAll().size());
     }
 }
