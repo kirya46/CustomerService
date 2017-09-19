@@ -44,7 +44,6 @@ or run project from sources without building:
                   "phone" : "Test phone"
                 }' http://localhost:8080/customer/create`
       
-      response:          
       HTTP/1.1 201 
       Content-Type: application/json;charset=UTF-8
       Transfer-Encoding: chunked
@@ -138,9 +137,10 @@ or run project from sources without building:
 By default project use **H2 in-memory** database. Also project has **PostgresSQL** configuration.
 
 For use Postgres as main database in project: 
-    - install Postgres (http://www.postgresqltutorial.com/install-postgresql/)
-    - create database ( https://www.tutorialspoint.com/postgresql/postgresql_create_database.htm )
-    - change config file **../src/main/resources/database.properties** 
+
+- install Postgres (http://www.postgresqltutorial.com/install-postgresql/)
+- create database ( https://www.tutorialspoint.com/postgresql/postgresql_create_database.htm )
+- change config file **../src/main/resources/database.properties** 
     
 Comment next lines:
         
